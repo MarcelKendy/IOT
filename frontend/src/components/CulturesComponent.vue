@@ -159,6 +159,18 @@
         >Dado removido com sucesso</strong
       >
     </v-snackbar>
+    <v-snackbar
+      v-model="snackbar_cantdelete"
+      timeout="6500"
+      elevation="24"
+      rounded="pill"
+      color="orange"
+    >
+      <v-icon class="pr-3" dark>mdi-alert-circle</v-icon>
+      <strong class="white--text"
+        >Não é possível deletar pois existe ao menos uma Área cadastrada com essa cultura</strong
+      >
+    </v-snackbar>
   </div>
 </template>
 
@@ -186,6 +198,7 @@ export default {
     snackbar_add: false,
     snackbar_edit: false,
     snackbar_delete: false,
+    snackbar_cantdelete: false,
   }),
   created() {
     this.getData();
@@ -208,7 +221,12 @@ export default {
       });
     },
     deleteData(id) {
-      this.$http.delete(`delete_culture/${id}`).then(() => {
+      this.$http.delete(`delete_culture/${id}`).then((response) => {
+        if (response.data == 404) {
+          this.deleteModal();
+          this.snackbar_cantdelete = true
+          return true
+        }
         this.items = this.items.filter((data) => {
           return data.id !== id;
         });

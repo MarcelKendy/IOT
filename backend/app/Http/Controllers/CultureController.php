@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Culture;
+use App\Models\Batch;
 
 
 class CultureController extends Controller
@@ -35,6 +36,10 @@ class CultureController extends Controller
 
     public function deleteCulture(Culture $culture, Request $request)
     {
+        $batches = count(Batch::where('culture_id', $culture->id)->limit(1)->get()->toArray());
+        if ($batches > 0) {
+            return 404;
+        }
         $culture->delete();
         return response()->json($culture);
     }
